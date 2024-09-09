@@ -18,7 +18,7 @@ namespace TranslateApi.Controllers
         [HttpPost]
         public async Task<IActionResult> TranslateText([FromBody] TextModel model)
         {
-            var authKey = "51062dfb-8acd-43e3-bf31-f93d596cfab1:fx";
+            var authKey = "51062dfb-8acd-43e3-bf31...";
             var translator = new Translator(authKey);
 
             System.Console.WriteLine(model.SourceLanguage + model.TargetLanguage);
