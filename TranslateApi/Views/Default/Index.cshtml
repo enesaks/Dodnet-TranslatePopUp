@@ -1,0 +1,101 @@
+﻿@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Translate Text</title>
+    <link rel="stylesheet" href="~/css/site.css">
+</head>
+
+<body>
+
+    <div class="container">
+        <h2>Translate Text</h2>
+        <input type="text" id="myTextBox" placeholder="Enter text here..." />
+    </div>
+
+    <div id="popup">
+        <p>Metni çevirmek istiyor musunuz?</p>
+        <p>Ana Dil</p>
+        <select name="Source Language" id="sourceLanguageSelect">
+            <option value="Tr">Turkish</option>
+            <option value="En">English</option>
+            <option value="Es">Spanish</option>
+            <option value="Fr">French</option>
+            <option value="De">German</option>
+        </select>
+        <p>Çevrilen Dil</p>
+        <select name="Target Language" id="targetLanguageSelect">
+            <option value="En">English</option>
+            <option value="Es">Spanish</option>
+            <option value="Fr">French</option>
+            <option value="De">German</option>
+            <option value="Tr">Turkish</option>
+        </select>
+
+        <button onclick="translateSelection()">Çevir</button>
+    </div>
+
+</body>
+
+<script>
+
+    document.getElementById('myTextBox').addEventListener('mouseup', function (e) {
+        var selectedText = window.getSelection().toString().trim();
+        if (selectedText.length > 0) {
+            var popup = document.getElementById('popup');
+            popup.style.left = e.pageX + 'px';
+            popup.style.top = e.pageY + 'px';
+            popup.style.display = 'block';
+        }
+    });
+
+    document.addEventListener('click', function (e) {
+        var popup = document.getElementById('popup');
+        if (!popup.contains(e.target) && e.target.id !== 'myTextBox') {
+            popup.style.display = 'none';
+        }
+    });
+
+    function translateSelection() {
+        var textbox = document.getElementById("myTextBox");
+        var selectedText = window.getSelection().toString().trim(); // Seçili metni al
+        var targetLanguage = document.getElementById("targetLanguageSelect").value;
+        var sourceLanguage = document.getElementById("sourceLanguageSelect").value;
+
+        if (selectedText.length === 0) {
+            alert("Lütfen çevrilecek bir metin seçin.");
+            return;
+        }
+
+        fetch('/Default/TranslateText', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                text: selectedText,
+                targetLanguage: targetLanguage,
+                sourceLanguage: sourceLanguage
+            })
+        })
+            .then(response => response.json())
+            .then(data => {
+                var fullText = textbox.value;
+                var newText = fullText.replace(selectedText, data.translatedText);
+                textbox.value = newText; // Seçili metni çevirip orijinal metinde değiştir
+                document.getElementById('popup').style.display = 'none'; // Popup'ı gizle
+            })
+            .catch(error => {
+                console.error('Hata:', error);
+            });
+    }
+
+
+</script>
+
+</html>
